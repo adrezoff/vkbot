@@ -1,7 +1,8 @@
-import products.products
 from admins.admin import *
 from admins.admin_data import set_edit_id, get_edit_id
 from products.products import *
+from users import products_user_data
+from users.products_user_data import set_product_id, get_product_id
 
 
 class State:
@@ -37,15 +38,15 @@ class AdminMenuState(State):
             return MenuState(self.send_message)
 
     def handle_input(self, user_id, message):
-        if message.lower() == '1' or message.lower() == 'добавить товар':
+        if message == '1' or message.lower() == 'добавить товар':
             return AddProductState(self.send_message)
-        elif message.lower() == '2' or message.lower() == 'изменить товар':
+        elif message == '2' or message.lower() == 'изменить товар':
             return EditProductState(self.send_message)
-        elif message.lower() == '3' or message.lower() == 'удалить товар':
+        elif message == '3' or message.lower() == 'удалить товар':
             return DeleteProductsState(self.send_message)
-        elif message.lower() == 'назад':
+        elif message == 'назад':
             return MenuState(self.send_message)
-        elif message.lower() == 'menu':
+        elif message == 'меню':
             return MenuState(self.send_message)
         else:
             self.send_message(user_id, "Некорректный ввод. Попробуйте снова:")
@@ -60,7 +61,7 @@ class StartState(State):
         pass
 
     def handle_input(self, user_id, message):
-        if message.lower() == 'назад':
+        if message == 'назад':
             return StartState(self.send_message)
         self.send_message(user_id, "successful load")
         return MenuState(self.send_message)
@@ -77,13 +78,13 @@ class MenuState(State):
                                    "3) Контакты\n")
 
     def handle_input(self, user_id, message):
-        if message.lower() == '1' or message.lower() == 'товары':
+        if message == '1' or message.lower() == 'товары':
             return ViewProductsState(self.send_message)
-        elif message.lower() == 'назад':
-            return StartState(self.send_message)
-        elif message.lower() == 'admin':
+        elif message == 'назад':
+            return MenuState(self.send_message)
+        elif message == 'admin':
             return AdminMenuState(self.send_message)
-        elif message.lower() == 'menu':
+        elif message == 'меню':
             return MenuState(self.send_message)
 
 
@@ -96,11 +97,9 @@ class AddProductState(State):
         self.send_message(user_id, "Введите название товара:")
 
     def handle_input(self, user_id, message):
-        if message.lower() == 'menu':
-            set_edit_id(user_id, "0")
+        if message == 'меню':
             return MenuState(self.send_message)
-        elif message.lower() == 'назад':
-            set_edit_id(user_id, "0")
+        elif message == 'назад':
             return AdminMenuState(self.send_message)
         if 'name' not in self.state_data:
             self.state_data['name'] = message
@@ -110,7 +109,7 @@ class AddProductState(State):
             self.send_message(user_id, "Введите цену товара:")
         elif 'price' not in self.state_data:
             try:
-                price = float(message)
+                price = int(message)
                 self.state_data['price'] = price
                 add_product(self.state_data['name'], self.state_data['description'], price)
                 self.send_message(user_id, f"Товар '{self.state_data['name']}' успешно добавлен!")
@@ -133,9 +132,9 @@ class DeleteProductsState(State):
         self.send_message(user_id, final_str)
 
     def handle_input(self, user_id, message):
-        if message.lower() == 'menu':
+        if message == 'меню':
             return MenuState(self.send_message)
-        elif message.lower() == 'назад':
+        elif message == 'назад':
             return AdminMenuState(self.send_message)
         elif message.isdigit():
             product_id = message
@@ -162,9 +161,9 @@ class ViewProductsState(State):
         self.send_message(user_id, final_str)
 
     def handle_input(self, user_id, message):
-        if message.lower() == 'menu':
+        if message == 'меню':
             return MenuState(self.send_message)
-        elif message.lower() == 'назад':
+        elif message == 'назад':
             return MenuState(self.send_message)
         elif message.isdigit():
             product_id = message
@@ -172,6 +171,8 @@ class ViewProductsState(State):
             if product_id in products:
                 product_info = products[product_id]
                 self.send_message(user_id, f"Название: {product_info['name']}\nОписание: {product_info['description']}\nЦена: {product_info['price']}" + " RUB\n")
+                set_product_id(user_id, product_id)
+                return EarlyCreateOrder(self.send_message)
             else:
                 self.send_message(user_id, "Такого товара не существует.")
         else:
@@ -191,9 +192,9 @@ class EditProductState(State):
         self.send_message(user_id, final_str)
 
     def handle_input(self, user_id, message):
-        if message.lower() == 'menu':
+        if message == 'меню':
             return MenuState(self.send_message)
-        elif message.lower() == 'назад':
+        elif message == 'назад':
             return AdminMenuState(self.send_message)
 
         products = load_products()
@@ -219,10 +220,10 @@ class EditMenuProductState(State):
                                     "3) Цену")
 
     def handle_input(self, user_id, message):
-        if message.lower() == 'menu':
+        if message == 'меню':
             set_edit_id(user_id, "0")
             return MenuState(self.send_message)
-        elif message.lower() == 'назад':
+        elif message == 'назад':
             set_edit_id(user_id, "0")
             return AdminMenuState(self.send_message)
         elif message.lower() == '1' or message.lower() == 'название':
@@ -244,9 +245,9 @@ class EditProductNameState(State):
         self.send_message(user_id, "Введите новое название товара:")
 
     def handle_input(self, user_id, message):
-        if message.lower() == 'menu':
+        if message == 'меню':
             return MenuState(self.send_message)
-        elif message.lower() == 'назад':
+        elif message == 'назад':
             return AdminMenuState(self.send_message)
 
         products = load_products()
@@ -269,9 +270,9 @@ class EditProductDescriptionState(State):
         self.send_message(user_id, "Введите новое описание товара:")
 
     def handle_input(self, user_id, message):
-        if message.lower() == 'menu':
+        if message == 'меню':
             return MenuState(self.send_message)
-        elif message.lower() == 'назад':
+        elif message == 'назад':
             return AdminMenuState(self.send_message)
 
         products = load_products()
@@ -294,16 +295,16 @@ class EditProductPriceState(State):
         self.send_message(user_id, "Введите новую цену товара:")
 
     def handle_input(self, user_id, message):
-        if message.lower() == 'menu':
+        if message == 'меню':
             return MenuState(self.send_message)
-        elif message.lower() == 'назад':
+        elif message == 'назад':
             return AdminMenuState(self.send_message)
 
         products = load_products()
         selected_product_id = get_edit_id(user_id)
         if selected_product_id in products:
             try:
-                price = float(message)
+                price = int(message)
                 products[selected_product_id]['price'] = price
                 save_products(products)
                 self.send_message(user_id, f"Цена товара успешно изменена на '{price}' RUB.")
@@ -314,3 +315,59 @@ class EditProductPriceState(State):
         else:
             self.send_message(user_id, "Ошибка: товар с указанным ID не найден.")
             return None
+
+
+class EarlyCreateOrder(State):
+    def __init__(self, send_message):
+        super().__init__('EarlyCreateOrder', send_message)
+        self.send_message = send_message
+
+    def on_enter(self, user_id):
+        keyboard = {
+            "one_time": True,
+            "buttons": [
+                [{
+                    "action": {
+                        "type": "text",
+                        "label": "Купить"
+                    },
+                    "color": "positive"
+                }],
+                [{
+                    "action": {
+                        "type": "text",
+                        "label": "Меню"
+                    },
+                    "color": "primary"
+                }]
+            ]
+        }
+        self.send_message(user_id, "Чтобы совершить покупку, нажмите кнопку 'Купить' или вернитесь 'Меню'.", keyboard)
+
+    def handle_input(self, user_id, message):
+        if message.lower() == 'купить':
+            product_id = get_product_id(user_id)
+            if product_id:
+                return MidCreateOrder(self.send_message)
+            else:
+                self.send_message(user_id, "Ошибка: не удалось найти выбранный товар.")
+        elif message == 'назад':
+            set_product_id(user_id, "0")
+            return ViewProductsState(self.send_message)
+        elif message == 'меню':
+            set_product_id(user_id, "0")
+            return MenuState(self.send_message)
+        else:
+            self.send_message(user_id, "Ошибка. Нажмите кнопку 'Купить' или 'Меню'.")
+            return None
+
+
+class MidCreateOrder(State):
+    def __init__(self, send_message):
+        super().__init__('MidCreateOrder', send_message)
+        self.send_message = send_message
+
+    def on_enter(self, user_id):
+        pass
+    def handle_input(self, user_id, message):
+        pass

@@ -21,6 +21,9 @@ def create_state_map(send_message):
     state_map["EditProductDescriptionState"] = EditProductDescriptionState(send_message)
     state_map["EditProductPriceState"] = EditProductPriceState(send_message)
 
+    state_map["EarlyCreateOrder"] = EarlyCreateOrder(send_message)
+    state_map["MidCreateOrder"] = MidCreateOrder(send_message)
+
 
 
     return state_map

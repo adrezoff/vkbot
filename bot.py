@@ -1,20 +1,18 @@
-import random
 import os
 from vk_api import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
 from dotenv import load_dotenv
 
-from admins.admin_data import create_admin_data_map
 from state.state_map import *
 from users.users import *
-from admins import admin_data
 
 
-def send_message(user_id, message):
+def send_message(user_id, message, keyboard=None):
     vk.messages.send(
         user_id=user_id,
-        random_id=random.randint(0, 2 ** 64),  # Генерируем случайное целое число
-        message=message
+        random_id=0,
+        message=message,
+        keyboard=json.dumps(keyboard) if keyboard else None
     )
 
 
