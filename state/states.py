@@ -368,6 +368,36 @@ class MidCreateOrder(State):
         self.send_message = send_message
 
     def on_enter(self, user_id):
-        pass
+        product_id = get_product_id(user_id)
+        if product_id:
+            product_info = load_products()[product_id]
+            price = product_info['price']
+            group_id = 123456789  # ID вашей группы VK
+
+            payment_link = f"https://vk.com/groovestdesign?act=pay_to_group&group_id={group_id}&amount={int(price)}"
+            print(payment_link)
+            keyboard = {
+                "one_time": True,
+                "buttons": [
+                    [{
+                        "action": {
+                            "type": "open_link",
+                            "link": payment_link,
+                            "label": "Оплатить через VK Pay"
+                        },
+                    }]
+                ]
+            }
+            self.send_message(user_id, f"Сумма к оплате: {price} RUB\n\nОплатить сейчас:", keyboard)
+        else:
+            self.send_message(user_id, "Ошибка: не удалось найти выбранный товар.")
+
+
     def handle_input(self, user_id, message):
-        pass
+        # Здесь вы можете обрабатывать ввод пользователя после оплаты или в случае отмены оплаты
+        if message == 'назад':
+            set_product_id(user_id, "0")
+            return ViewProductsState(self.send_message)
+        elif message == 'меню':
+            set_product_id(user_id, "0")
+            return MenuState(self.send_message)
