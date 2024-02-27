@@ -4,7 +4,7 @@ import uuid
 
 class Order:
     def __init__(self, user_id, product, price, status='новый'):
-        self.order_id = str(uuid.uuid4())  # ”никальный идентификатор заказа
+        self.order_id = str(uuid.uuid4())
         self.user_id = user_id
         self.product = product
         self.price = price

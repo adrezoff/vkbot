@@ -16,7 +16,6 @@ def send_message(user_id, message, keyboard=None):
     )
 
 
-# Инициализация сессии VK API
 load_dotenv()
 TOKEN = str(os.getenv('TOKEN'))
 vk_session = vk_api.VkApi(token=TOKEN)

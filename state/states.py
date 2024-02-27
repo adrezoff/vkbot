@@ -113,11 +113,11 @@ class AddProductState(State):
                 self.state_data['price'] = price
                 add_product(self.state_data['name'], self.state_data['description'], price)
                 self.send_message(user_id, f"Товар '{self.state_data['name']}' успешно добавлен!")
-                self.state_data = {}  # Сбрасываем состояние после успешного добавления товара
-                return AdminMenuState(self.send_message)  # Переходим в меню администратора
+                self.state_data = {}
+                return AdminMenuState(self.send_message)
             except ValueError:
                 self.send_message(user_id, "Некорректный формат цены. Попробуйте снова:")
-        return None  # Возвращаем None, чтобы оставаться в текущем состоянии до успешного ввода цены
+        return None
 
 
 class DeleteProductsState(State):
@@ -394,7 +394,6 @@ class MidCreateOrder(State):
 
 
     def handle_input(self, user_id, message):
-        # Здесь вы можете обрабатывать ввод пользователя после оплаты или в случае отмены оплаты
         if message == 'назад':
             set_product_id(user_id, "0")
             return ViewProductsState(self.send_message)

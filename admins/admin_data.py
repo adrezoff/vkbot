@@ -5,7 +5,7 @@ admin_map = {}
 
 def create_admin_data_map():
     for admin in admins.admin.load_admins():
-        admin_map[admin] = "0"  # Устанавливаем начальное значение 0 для каждого администратора
+        admin_map[admin] = "0"
     return admin_map
 
 

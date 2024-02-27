@@ -26,11 +26,10 @@ def delete_product(product_id):
     products = load_products()
     if product_id in products:
         del products[product_id]
-        # Перестраиваем словарь, чтобы его ключи соответствовали порядковым номерам
         rebuilt_products = {}
         for idx, (key, value) in enumerate(products.items(), start=1):
             rebuilt_products[str(idx)] = value
         save_products(rebuilt_products)
-        return True  # Возвращаем True, если товар успешно удален
+        return True
     else:
-        return False  # Возвращаем False, если товар с указанным ID не найден
+        return False
